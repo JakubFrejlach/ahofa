@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <cassert>
 #include <mutex>
+#include <string>
+#include <sstream>
 
 #include <pcap.h>
 #include <pcap/pcap.h>
@@ -46,6 +48,9 @@ pcap_t* init_pcap(const char* capturefile);
 
 template<typename F>
 pcap_t* process_payload(pcap_t *pcap, F func, unsigned long count = ~0UL);
+
+template<typename F>
+void process_strings(std::string filename, F func, unsigned long count = ~0UL);
 
 /// Generic function for processing packet payload.
 ///
@@ -99,6 +104,24 @@ pcap_t* process_payload(pcap_t *pcap, F func, unsigned long count)
     {
         return pcap;
     }
+}
+
+template<typename F>
+void process_strings(std::string filename, F func, unsigned long count)
+{
+  std::ifstream infile(filename);
+  
+  std::string line;
+  bool first_line_encountered = false; 
+  while (std::getline(infile, line))
+  {
+    if(!first_line_encountered)
+    {
+      first_line_encountered = true;
+      continue;
+    }
+    func((const unsigned char *)line.c_str(), line.length());
+  }
 }
 
 /// Extract payload from packet

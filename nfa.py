@@ -541,7 +541,7 @@ class Nfa:
         fr_file = tempfile.NamedTemporaryFile()
         with open(fa_file.name, 'w') as f:
             self.print(f)
-        subpr.call(['./state_frequency', fa_file.name, pcap, fr_file.name])
+        subpr.call(['{}./state_frequency'.format(os.getenv('AHOFA_PATH')), fa_file.name, pcap, fr_file.name])
         return self.retrieve_freq(fr_file.name)
 
     def retrieve_freq(self, fname):
@@ -597,8 +597,9 @@ class Nfa:
         string containing the values of evaluation statistics separated by a
         comma
         '''
-        prog = ' '.join(['./nfa_eval', target, reduced, '-n', str(nw), pcap,
+        prog = ' '.join(['{}./nfa_eval'.format(os.getenv('AHOFA_PATH')), target, reduced, '-n', str(nw), pcap,
              '-c']).split()
+        sys.stderr.write('{}\n'.format(prog))
         o = subpr.check_output(prog)
         return o.decode("utf-8")
 
